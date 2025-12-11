@@ -1,47 +1,49 @@
-# Running the Cision Spark Expectations Demo
+# Cision Data Governance Demo: The "Omni-Channel Crisis" Scenario
 
-This demo application showcases the power of **Spark Expectations** for Data Governance, Lineage, and Business Rule Transparency.
+This demo showcases how **Spark Expectations** provides stability, lineage, and "Shift-Left" quality gates during a high-velocity data crisis.
 
-## 📋 Prerequisites
-*   Python 3.10+
-*   Libraries: `streamlit`, `pandas`, `graphviz`
-*   (Optional) Graphviz system library installed (if visualization fails)
+**Scenario**: A viral rumor spreads about "BrandX Phones" exploding.
+*   **Social Data**: Flooded with negative sentiment and keyword "explode".
+*   **Inventory**: Showing discrepancies (potential theft/shrinkage).
+*   **Transactions**: Some sales data is malformed (`TXN_LOST`).
 
-## 🛠️ Installation
+Your Goal: Show how the Governance Framework catches these issues *before* they break the Executive Dashboard, and how you can trace missing data instantly.
 
-1.  **Install Python Dependencies**:
-    ```bash
-    pip install streamlit pandas graphviz
-    ```
+---
 
-    *Note: If you are on Mac and `graphviz` gives errors, install the binary:* `brew install graphviz`
+## 🎭 Demo Script / Walkthrough
 
-## 🚀 Launching the Demo
+### 1. The "Bird's Eye" View (Tab 1: Lineage)
+*   **Narrative**: "Let's look at the complexity of our modern pipeline. We aren't just moving tables; we are ingesting Social Streams (Kafka), Web Clickstream (S3), and ERP Data (Oracle)."
+*   **Visual**: Show the graph. Point to the **Red "Rule" Nodes**.
+*   **Key Point**: "Notice these Quality Gates. Unlike traditional pipelines that crash when bad data hits, these Gates actively filter and quarantine toxic data."
 
-1.  Navigate to the demo directory:
-    ```bash
-    cd spark-expectations-demo
-    ```
+### 2. The "Crisis" Dashboard (Tab 2: Business Rules)
+*   **Narrative**: "The system is flashing Red. Why? Let's look at the Business Rules."
+*   **Action**: Scroll to the failures.
+*   **Highlight 1**: `exp_prohibited_content` (CRITICAL).
+    *   *Say*: "We detected safety keywords like 'explode' in the raw social stream. This triggered an immediate alert."
+*   **Highlight 2**: `exp_inventory_balance` (CRITICAL).
+    *   *Say*: "Our Cross-System Integrity check failed. Sales + Remaining Inventory does not equal Starting Inventory. We have leakage."
+*   **Highlight 3**: `exp_pos_integrity` (HIGH).
+    *   *Say*: "We also have negative sales amounts trying to enter the ledger."
 
-2.  Run the Streamlit App:
-    ```bash
-    streamlit run app.py
-    ```
+### 3. The "Investigator" (Tab 5: Data Investigator)
+*   **Narrative**: "A Finance Analyst calls you. 'I can't find transaction `TXN_LOST` for $500. Did we lose it?'"
+*   **Action**: Go to Tab 5. Enter `TXN_LOST` and click **Trace Record**.
+*   **Visual**: Expand the headers.
+    *   ✅ **Source**: "Success - Record Ingested"
+    *   ❌ **Quality Gate**: "FAILED - Rule Violation: Amount (-500) <= 0"
+    *   ⚠️ **Target**: "Quarantined - Saved to Error Table"
+*   **Closing**: "We didn't lose the money. The system protected the ledger from a negative transaction. It's safely in the quarantine table for review."
 
-3.  The application will open in your default browser (usually at `http://localhost:8501`).
+### 4. The "Shift Left" (Tab 4: Process)
+*   **Narrative**: "How do we prevent this next time? Business users can define rules themselves."
+*   **Action**: Show the Rule Editor. Type "Sentiment must be > -0.5".
+*   **Key Point**: "This generates the code automatically. No 2-week engineering sprint required."
 
-## 🎯 Demo Walkthrough Script
+---
 
-**Tab 1: Data Lineage**
-*   **Narrative**: "Start by showing the 'Bird's Eye View'. We don't just run jobs; we have explicit Quality Gates checking data as it flows from Bronze (Customers/Orders) to Gold (Analytics)."
-*   **Visual**: Point out the yellow "Rules" nodes.
-
-**Tab 2: Business Rules & Status**
-*   **Narrative**: "This is what the Business sees. Not error logs, but 'Translated Rules'. We can see exactly why the LTV calculation failed—because of critical failures in the upstream Orders table."
-*   **Action**: Select "Orders must contain a valid Customer ID" in the dropdown to see the orphan records.
-
-**Tab 3: Inspect Data**
-*   **Narrative**: "Proof of transparency. Here is the raw data showing the issues (e.g., Row 5 in Customers has age 120)."
-
-**Tab 4: Rule Editor**
-*   **Narrative**: "The 'Shift Left' moment. A business user can propose a rule like 'Age < 100', and the system auto-generates the technical JSON config. No engineering bottleneck."
+## 🛠️ How to Run
+1.  **Install**: `pip install streamlit pandas graphviz`
+2.  **Run**: `streamlit run app.py`
