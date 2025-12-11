@@ -1,0 +1,54 @@
+[
+  {
+    "id": "exp_sentiment_bounds",
+    "table": "social_stream",
+    "column": "sentiment_score",
+    "expectation_type": "expect_column_values_to_be_between",
+    "kwargs": {"min_value": -1, "max_value": 1},
+    "business_description": "Sentiment scores must be normalized between -1.0 (Negative) and 1.0 (Positive).",
+    "severity": "High"
+  },
+  {
+    "id": "exp_prohibited_content",
+    "table": "social_stream",
+    "column": "content",
+    "expectation_type": "expect_column_values_to_not_match_regex",
+    "kwargs": {"regex": "(bomb|explode|fire)"},
+    "business_description": "CRITICAL ALERT: Mentions of safety hazards (fire, explode) require immediate escalation.",
+    "severity": "Critical"
+  },
+  {
+    "id": "exp_valid_event_types",
+    "table": "web_clickstream",
+    "column": "event_type",
+    "expectation_type": "expect_column_values_to_be_in_set",
+    "kwargs": {"value_set": ["view_item", "add_card", "checkout", "cart_abandon", "return_page"]},
+    "business_description": "Web events must match the defined taxonomy.",
+    "severity": "Medium"
+  },
+  {
+    "id": "exp_pos_integrity",
+    "table": "pos_transactions",
+    "column": "amount",
+    "expectation_type": "expect_column_values_to_be_greater_than",
+    "kwargs": {"value": 0},
+    "business_description": "Sales amount cannot be negative or zero.",
+    "severity": "High"
+  },
+  {
+    "id": "exp_inventory_balance",
+    "table": "erp_inventory",
+    "column": "end_count_realtime",
+    "expectation_type": "expect_inventory_calculation_match",
+    "business_description": "Physical Inventory must match (Start Count - Digital Sales).",
+    "severity": "Critical"
+  },
+  {
+    "id": "exp_complex_correlation",
+    "table": "gold_brand_health",
+    "column": "avg_sentiment",
+    "expectation_type": "expect_sentiment_abandonment_correlation",
+    "business_description": "If Sentiment drops below -0.5, Cart Abandonment should be flagged for 'Crisis Mode'.",
+    "severity": "Medium"
+  }
+]
