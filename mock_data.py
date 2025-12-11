@@ -39,11 +39,11 @@ def get_mock_data():
     # SYSTEM C: POINT OF SALE (Structured / Financial)
     # Scenario: Actual verified sales.
     pos_data = {
-        "txn_id": ["TXN_100", "TXN_101"], # Only 2 sales happened out of the sessions above!
-        "session_id": ["sess_5001", "sess_5007"],
-        "sku": ["SKU_999", "SKU_999"],
-        "amount": [999.99, 999.99],
-        "store_id": ["online_01", "online_01"]
+        "txn_id": ["TXN_100", "TXN_101", "TXN_LOST"], # TXN_LOST has a negative amount!
+        "session_id": ["sess_5001", "sess_5007", "sess_5009"],
+        "sku": ["SKU_999", "SKU_999", "SKU_999"],
+        "amount": [999.99, 999.99, -500.00],
+        "store_id": ["online_01", "online_01", "online_01"]
     }
     pos_df = pd.DataFrame(pos_data)
 

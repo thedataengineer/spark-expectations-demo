@@ -163,3 +163,43 @@ class GovernanceEngine:
                 ("join_inv", "dash")
             ]
         }
+    
+    def get_record_trace(self, record_id):
+        """
+        Simulates a Data Lineage Trace for a specific ID.
+        Returns the path and status.
+        """
+        # Logic: Check validation results to see if this ID failed.
+        # In a real Spark Ex environment, we'd query the `_error` table.
+        # For this mock, we infer it.
+        
+        trace = {
+            "record_id": record_id,
+            "steps": [],
+            "final_status": "Unknown"
+        }
+        
+        # 1. Search Source (POS)
+        pos_df = self.data_dict.get("pos_transactions")
+        if pos_df is not None and record_id in pos_df["txn_id"].values:
+            trace["steps"].append({"stage": "Source: POS System", "status": "Success", "msg": "Record Ingested"})
+            
+            # 2. Check Validation Rules (Did it fail?)
+            # We assume we ran run_validation already, but let's re-verify the specific failure for this ID.
+            # Hardcoded Check logic for the demo scenario 'TXN_LOST'
+            row = pos_df[pos_df["txn_id"] == record_id].iloc[0]
+            
+            if row["amount"] <= 0:
+                trace["steps"].append({"stage": "Transformation: Join Inventory", "status": "Skipped", "msg": "Propagated to Error Handlers"})
+                trace["steps"].append({"stage": "Quality Gate: exp_pos_integrity", "status": "FAILED", "msg": f"Rule Violation: Amount ({row['amount']}) <= 0"})
+                trace["steps"].append({"stage": "Target: Quarantine Table", "status": "Quarantined", "msg": "Record Saved to Error Table"})
+                trace["final_status"] = "Quarantined"
+            else:
+                 trace["steps"].append({"stage": "Transformation: Join Inventory", "status": "Success", "msg": "Joined with ERP Data"})
+                 trace["steps"].append({"stage": "Target: Gold Dashboard", "status": "Success", "msg": "Available in Analytics"})
+                 trace["final_status"] = "Deployed"
+                 
+            return trace
+
+        return trace
+

@@ -29,7 +29,7 @@ def load_and_run():
 data_dict, results_df, lineage_graph, rules_config = load_and_run()
 
 # -- Tabs --
-tab1, tab2, tab3, tab4 = st.tabs(["🧩 Data Lineage", "📋 Business Rules & Status", "🔎 Inspect Data", "✏️ Rule Editor (Mock)"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🧩 Data Lineage", "📋 Business Rules & Status", "🔎 Inspect Data", "✏️ Rule Editor (Mock)", "🕵️ Data Investigator"])
 
 # === TAB 1: LINEAGE ===
 with tab1:
@@ -134,6 +134,30 @@ with tab4:
         
     if st.button("Deploy Rule to Production"):
         st.toast("Rule deployed to Rules Engine! (Simulation)", icon="🚀")
+
+# === TAB 5: INVESTIGATOR ===
+with tab5:
+    st.header("Traceability Investigator")
+    st.markdown("Use this tool to find 'Missing Data' caused by quality failures (GDPR / Audit Compliance).")
+    
+    st.info("Scenario: Finance team cannot find Transaction `TXN_LOST` in the dashboard.")
+    
+    search_id = st.text_input("Enter Transaction ID", "TXN_LOST")
+    
+    if st.button("Trace Record"):
+        # Re-instantiate engine to use the trace method
+        # (In prod, this would be an API call)
+        eng = GovernanceEngine(data_dict, rules_config)
+        trace = eng.get_record_trace(search_id)
+        
+        st.subheader(f"Lineage Path for: `{search_id}`")
+        st.write(f"Final Status: **{trace['final_status']}**")
+        
+        for step in trace["steps"]:
+            status_icon = "✅" if step["status"] == "Success" else "❌" if step["status"] == "FAILED" else "⚠️"
+            with st.expander(f"{status_icon} {step['stage']}", expanded=True):
+                st.write(f"**Status**: {step['status']}")
+                st.write(f"**Details**: {step['msg']}")
 
 # -- Footer --
 st.divider()
